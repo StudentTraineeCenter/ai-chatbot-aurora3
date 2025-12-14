@@ -10,7 +10,6 @@ import {
   RedoIcon,
   UndoIcon,
 } from "@/components/icons";
-import { Editor } from "@/components/text-editor";
 import type { Suggestion } from "@/lib/db/schema";
 import { getSuggestions } from "../actions";
 
@@ -37,7 +36,7 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
       });
     }
 
-    if (streamPart.type === "data-textDelta") {
+   
       setArtifact((draftArtifact) => {
         return {
           ...draftArtifact,
@@ -51,7 +50,6 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
           status: "streaming",
         };
       });
-    }
   },
   content: ({
     mode,
@@ -73,24 +71,7 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
       const newContent = getDocumentContentById(currentVersionIndex);
 
       return <DiffView newContent={newContent} oldContent={oldContent} />;
-    }
-
-    return (
-      <div className="flex flex-row px-4 py-8 md:p-20">
-        <Editor
-          content={content}
-          currentVersionIndex={currentVersionIndex}
-          isCurrentVersion={isCurrentVersion}
-          onSaveContent={onSaveContent}
-          status={status}
-          suggestions={metadata ? metadata.suggestions : []}
-        />
-
-        {metadata?.suggestions && metadata.suggestions.length > 0 ? (
-          <div className="h-dvh w-12 shrink-0 md:hidden" />
-        ) : null}
-      </div>
-    );
+    };
   },
   actions: [
     {

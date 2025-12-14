@@ -4,56 +4,78 @@ import { z } from "zod";
 const N2YO_API_KEY = "HZE5FN-D27FKL-HEXHMC-5MBR";
 
 export const getSatellite = tool({
-  description: "Get the current position of a satellite. You can search by satellite name (e.g., 'ISS', 'SPACE STATION', 'HUBBLE') or by NORAD ID. Requires observer coordinates (latitude/longitude) to calculate position relative to that location.",
+  description:
+    "Get visible satellites at a location or track a specific satellite. When no satellite is specified, returns satellites that will be visible soon from the observer's location.",
   inputSchema: z.object({
-    satelliteId: z.number().describe("NORAD satellite ID (e.g., 25544 for ISS)").optional(),
-    satelliteName: z.string().describe("Satellite name to search for (e.g., 'ISS', 'SPACE STATION')").optional(),
-    observerLat: z.number().min(-90).max(90).describe("Observer latitude in degrees"),
-    observerLng: z.number().min(-180).max(180).describe("Observer longitude in degrees"),
-    observerAlt: z.number().default(0).describe("Observer altitude in meters above sea level"),
-    seconds: z.number().min(1).max(300).default(2).describe("Number of seconds to retrieve positions for (1-300)"),
+    satelliteId: z
+      .number()
+      .describe(
+        "NORAD satellite ID (e.g., 25544 for ISS). If not provided, returns visible satellites at the location."
+      )
+      .optional(),
+    observerLat: z
+      .number()
+      .min(-90)
+      .max(90)
+      .describe("Observer latitude in degrees"),
+    observerLng: z
+      .number()
+      .min(-180)
+      .max(180)
+      .describe("Observer longitude in degrees"),
+    observerAlt: z
+      .number()
+      .default(0)
+      .describe("Observer altitude in meters above sea level"),
+    seconds: z
+      .number()
+      .min(1)
+      .max(300)
+      .default(2)
+      .describe("Number of seconds to retrieve positions for (1-300)"),
   }),
   execute: async (input) => {
-    let satId: number;
-
-    // If satellite name is provided, search for it first
-    if (input.satelliteName && !input.satelliteId) {
-      try {
-        const searchResponse = await fetch(
-          `https://api.n2yo.com/rest/v1/satellite/search/name/${encodeURIComponent(input.satelliteName)}?apiKey=${N2YO_API_KEY}`
+    try {
+      // If no satellite ID provided, get visible satellites at location
+      if (!input.satelliteId) {
+        const response = await fetch(
+          `https://api.n2yo.com/rest/v1/satellite/above/${input.observerLat}/${input.observerLng}/${input.observerAlt}/70/0&apiKey=${N2YO_API_KEY}`
         );
-        
-        if (!searchResponse.ok) {
+
+        if (!response.ok) {
           return {
-            error: `Failed to search for satellite "${input.satelliteName}"`,
+            error: `Failed to fetch visible satellites (HTTP ${response.status})`,
           };
         }
 
-        const searchData = await searchResponse.json();
-        
-        if (!searchData?.member || searchData.member.length === 0) {
+        const data = await response.json();
+
+        if (!data.above || data.above.length === 0) {
           return {
-            error: `No satellite found with name "${input.satelliteName}". Try using a NORAD ID instead.`,
+            error: "No visible satellites found at this location.",
           };
         }
 
-        satId = searchData.member[0].satid;
-      } catch (error) {
         return {
-          error: `Error searching for satellite: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          type: "visible-satellites",
+          count: data.above.length,
+          satellites: data.above.map((sat: any) => ({
+            satid: sat.satid,
+            satname: sat.satname,
+            intDesignator: sat.intDesignator,
+            launchDate: sat.launchDate,
+          })),
+          observerLocation: {
+            latitude: input.observerLat,
+            longitude: input.observerLng,
+            altitude: input.observerAlt,
+          },
         };
       }
-    } else if (input.satelliteId) {
-      satId = input.satelliteId;
-    } else {
-      return {
-        error: "Please provide either a satellite name or NORAD ID.",
-      };
-    }
 
-    try {
+      // If satellite ID is provided, get its positions
       const response = await fetch(
-        `https://api.n2yo.com/rest/v1/satellite/positions/${satId}/${input.observerLat}/${input.observerLng}/${input.observerAlt}/${input.seconds}&apiKey=${N2YO_API_KEY}`
+        `https://api.n2yo.com/rest/v1/satellite/positions/${input.satelliteId}/${input.observerLat}/${input.observerLng}/${input.observerAlt}/${input.seconds}&apiKey=${N2YO_API_KEY}`
       );
 
       if (!response.ok) {
@@ -71,6 +93,7 @@ export const getSatellite = tool({
       }
 
       return {
+        type: "satellite-positions",
         info: data.info,
         positions: data.positions,
         observerLocation: {
@@ -81,7 +104,7 @@ export const getSatellite = tool({
       };
     } catch (error) {
       return {
-        error: `Error fetching satellite data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: `Error fetching satellite data: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
     }
   },

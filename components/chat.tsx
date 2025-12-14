@@ -31,7 +31,7 @@ import { Messages } from "./messages";
 import { MultimodalInput } from "./multimodal-input";
 import { getChatHistoryPaginationKey } from "./sidebar-history";
 import { toast } from "./toast";
-import type { VisibilityType } from "./visibility-selector";
+
 
 export function Chat({
   id,
@@ -45,7 +45,7 @@ export function Chat({
   id: string;
   initialMessages: ChatMessage[];
   initialChatModel: string;
-  initialVisibilityType: VisibilityType;
+  initialVisibilityType: "private";
   isReadonly: boolean;
   autoResume: boolean;
   initialLastContext?: AppUsage;
