@@ -1,5 +1,4 @@
 import type { Geo } from "@vercel/functions";
-import type { ArtifactKind } from "@/components/artifact";
 
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
@@ -51,7 +50,6 @@ About the origin of user's request:
 `;
 
 export const systemPrompt = ({
-  selectedChatModel,
   requestHints,
 }: {
   selectedChatModel: string;
@@ -59,56 +57,15 @@ export const systemPrompt = ({
 }) => {
   const requestPrompt = getRequestPromptFromHints(requestHints);
 
-  if (selectedChatModel === "chat-model-reasoning") {
-    return `${regularPrompt}\n\n${requestPrompt}`;
-  }
-
   return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
 };
 
-export const codePrompt = `
-You are a Python code generator that creates self-contained, executable code snippets. When writing code:
-
-1. Each snippet should be complete and runnable on its own
-2. Prefer using print() statements to display outputs
-3. Include helpful comments explaining the code
-4. Keep snippets concise (generally under 15 lines)
-5. Avoid external dependencies - use Python standard library
-6. Handle potential errors gracefully
-7. Return meaningful output that demonstrates the code's functionality
-8. Don't use input() or other interactive functions
-9. Don't access files or network resources
-10. Don't use infinite loops
-
-Examples of good snippets:
-
-# Calculate factorial iteratively
-def factorial(n):
-    result = 1
-    for i in range(1, n + 1):
-        result *= i
-    return result
-
-print(f"Factorial of 5 is: {factorial(5)}")
-`;
-
-export const sheetPrompt = `
-You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
-`;
-
 export const updateDocumentPrompt = (
   currentContent: string | null,
-  type: ArtifactKind
+  type: "text"
 ) => {
   let mediaType = "document";
-
-  if (type === "code") {
-    mediaType = "code snippet";
-  } else if (type === "sheet") {
-    mediaType = "spreadsheet";
-  }
-
-  return `Improve the following contents of the ${mediaType} based on the given prompt.
+  return `Improve the following contents of the text based on the given prompt.
 
 ${currentContent}`;
 };

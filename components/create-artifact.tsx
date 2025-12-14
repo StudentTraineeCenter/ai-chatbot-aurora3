@@ -10,7 +10,7 @@ export type ArtifactActionContext<M = any> = {
   handleVersionChange: (type: "next" | "prev" | "toggle" | "latest") => void;
   currentVersionIndex: number;
   isCurrentVersion: boolean;
-  mode: "edit" | "diff";
+  mode: "edit";
   metadata: M;
   setMetadata: Dispatch<SetStateAction<M>>;
 };
@@ -36,7 +36,7 @@ export type ArtifactToolbarItem = {
 type ArtifactContent<M = any> = {
   title: string;
   content: string;
-  mode: "edit" | "diff";
+  mode: "edit";
   isCurrentVersion: boolean;
   currentVersionIndex: number;
   status: "streaming" | "idle";

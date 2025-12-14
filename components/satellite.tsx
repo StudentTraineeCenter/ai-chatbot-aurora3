@@ -67,7 +67,6 @@ function VisibleSatellitesList({ data }: { data: VisibleSatellitesData }) {
         "border border-white/10 bg-black/60 backdrop-blur-md"
       )}
       style={{
-        backgroundImage: "url('/images/nightsky.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "overlay",
@@ -159,7 +158,6 @@ function SatellitePositions({ data }: { data: SatellitePositionData }) {
         "border border-white/10 bg-black/60 backdrop-blur-md"
       )}
       style={{
-        backgroundImage: "url('/images/nightsky.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "overlay",

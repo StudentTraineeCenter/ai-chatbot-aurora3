@@ -3,7 +3,6 @@ import type { ArtifactKind } from "@/components/artifact";
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
-  saveDocument,
 } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
 
@@ -72,16 +71,6 @@ export async function POST(request: Request) {
       return new ChatSDKError("forbidden:document").toResponse();
     }
   }
-
-  const document = await saveDocument({
-    id,
-    content,
-    title,
-    kind,
-    userId: session.user.id,
-  });
-
-  return Response.json(document, { status: 200 });
 }
 
 export async function DELETE(request: Request) {

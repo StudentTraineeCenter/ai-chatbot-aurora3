@@ -1,6 +1,5 @@
 import { toast } from "sonner";
 import { Artifact } from "@/components/create-artifact";
-import { DiffView } from "@/components/diffview";
 import { DocumentSkeleton } from "@/components/document-skeleton";
 import {
   ClockRewind,
@@ -52,26 +51,11 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
       });
   },
   content: ({
-    mode,
-    status,
-    content,
-    isCurrentVersion,
-    currentVersionIndex,
-    onSaveContent,
-    getDocumentContentById,
     isLoading,
-    metadata,
   }) => {
     if (isLoading) {
       return <DocumentSkeleton artifactKind="text" />;
     }
-
-    if (mode === "diff") {
-      const oldContent = getDocumentContentById(currentVersionIndex - 1);
-      const newContent = getDocumentContentById(currentVersionIndex);
-
-      return <DiffView newContent={newContent} oldContent={oldContent} />;
-    };
   },
   actions: [
     {

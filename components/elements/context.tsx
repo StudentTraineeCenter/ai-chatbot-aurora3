@@ -155,15 +155,6 @@ export const Context = ({ className, usage, ...props }: ContextProps) => {
               label="Output"
               tokens={usage?.outputTokens}
             />
-            <InfoRow
-              costText={usage?.costUSD?.reasoningUSD?.toString()}
-              label="Reasoning"
-              tokens={
-                usage?.reasoningTokens && usage.reasoningTokens > 0
-                  ? usage.reasoningTokens
-                  : undefined
-              }
-            />
             {usage?.costUSD?.totalUSD !== undefined && (
               <>
                 <Separator className="mt-1" />

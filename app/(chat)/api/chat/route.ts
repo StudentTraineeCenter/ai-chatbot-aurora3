@@ -22,7 +22,7 @@ import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import type { ChatModel } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { myProvider } from "@/lib/ai/providers";
-import { createDocument } from "@/lib/ai/tools/create-document";
+//import { createDocument } from "@/lib/ai/tools/create-document";
 import { getSatellite } from "@/lib/ai/tools/get-satellite";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
@@ -186,21 +186,15 @@ export async function POST(request: Request) {
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
           experimental_activeTools:
-            selectedChatModel === "chat-model-reasoning"
-              ? []
-              : [
-                  "getWeather",
-                  "getSatellite",
-                  "createDocument",
-                  "updateDocument",
-                  "requestSuggestions",
-                ],
+           [
+            "getWeather",
+            "getSatellite",
+            "requestSuggestions",
+          ],
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
             getWeather,
             getSatellite,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
             requestSuggestions: requestSuggestions({
               session,
               dataStream,
@@ -248,7 +242,7 @@ export async function POST(request: Request) {
 
         dataStream.merge(
           result.toUIMessageStream({
-            sendReasoning: true,
+            sendReasoning: false,
           })
         );
       },
