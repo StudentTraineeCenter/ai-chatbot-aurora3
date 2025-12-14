@@ -1,5 +1,6 @@
 "use server";
 
+import { azure } from '@ai-sdk/azure';
 import { generateText, type UIMessage } from "ai";
 import { cookies } from "next/headers";
 import type { VisibilityType } from "@/components/visibility-selector";
@@ -23,7 +24,7 @@ export async function generateTitleFromUserMessage({
   message: UIMessage;
 }) {
   const { text: title } = await generateText({
-    model: myProvider.languageModel("title-model"),
+    model: azure.languageModel("o4-mini"),
     system: titlePrompt,
     prompt: getTextFromMessage(message),
   });
